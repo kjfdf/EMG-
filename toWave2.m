@@ -20,26 +20,28 @@ for i=1:numData
     startIndex=length('Sweep  Data(mV)<960>=');
     disp(startIndex);
     tSignal= '';
-    for i=1:40
-         currLine = fgetl(fid);
-         %sweepData = startsWith (currLine, 'Sweep  Data(mV)<960>=');
-         if (startsWith (currLine, 'Sweep  Data(mV)<960>='))
-             currLine = currLine(startIndex+1:length(currLine));
-             tSignal = [tSignal, currLine];
-         end
+    for j=1:101
+        j=j-1
+        for i=1:(100000-1000*j)
+            try
+             currLine = fgetl(fid);
+             %sweepData = startsWith (currLine, 'Sweep  Data(mV)<960>=');
+             if (startsWith (currLine, 'Sweep  Data(mV)<960>='))
+                 currLine = currLine(startIndex+1:length(currLine));
+                 tSignal = [tSignal, currLine];
+             elseif (startsWith (currLine, 'Trace Duration(ms)='))
+                 currLine = currLine (20:length(currLine));
+                 traceDuration = str2double(currLine)/1000;
+             elseif (startsWith (currLine, 'Amplifier Range'))
+                 currLine = currLine (21:length(currLine));
+                 ampRange = str2double(currLine);
+             end
+            end
+        end
     end
+  
 
     %while ~feof(fid)
-    for i=1:length(tSignal)
-         if (startsWith (currLine, 'Trace Duration(ms)='))
-             currLine = currLine (20:length(currLine));
-             traceDuration = str2double(currLine)/1000;
-         elseif (startsWith (currLine, 'Amplifier Range'))
-             currLine = currLine (21:length(currLine));
-             ampRange = str2double(currLine);
-         end
-    end
-
     %convert str to float
     nSignal = strread (tSignal, '%f');
 
@@ -53,7 +55,8 @@ for i=1:numData
     %ylim ([-0.05 0.05]);
     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
     xlabel('time(s)');  
-    print(fileName,'-dpng')
+    fileN=extractBefore(fileName,".txt")
+    print(fileN,'-dpng')
 %     exportgraphics(f,
     close(f)
 end
