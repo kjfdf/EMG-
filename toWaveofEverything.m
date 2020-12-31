@@ -77,8 +77,26 @@ for i=1:numData
 
     EMGfigure=figure('fileName','figure','NumberTitle','off');
 %     f=figure('visible','off');
-    plot (time, nSignal);
-    %ylim ([-0.05 0.05]);
+    tiledlayout(2,1)
+    subplot(3,3,[1:3])
+    plot (time, nSignal,'k.');
+    topAxs=gca;
+    axis tight
+    
+%     amplitude를 0.2mV로 자른 그래프를 메인으로 해서 위치시킴.
+    subplot(3,3,[4:9])
+    main=plot(time, nSignal)
+    ylim([-5 5])
+    set(gca,'YTick',[-5:0.2:5]) %y축의 눈금을 0부터 5까지 0.2간격으로 조정
+    set(gca,'XTick',[0:0.01:30]) %x축의 눈금을 0부터 30까지 0.01간격으로 조정 
+    
+    mainAxs = gca;
+    mainAxsRatio = get(mainAxs,'PlotBoxAspectRatio')
+%     main그래프를 크게 하고 원래 그래프를 작게해서 위치시킴. 
+    mainAxsratio = mainAxs.PlotBoxAspectRatio(1)/mainAxs.PlotBoxAspectRatio(2);
+    topAxsratio = mainAxsratio * mainAxs.Position(3)/topAxs.Position(3);
+    topAxs.PlotBoxAspectRatio = [topAxsratio, 1, 3];
+    
     set(gcf, 'Units', 'Normalized', 'OuterPosition', [0 0 1 1]);
     xlabel('time(s)');
     ylabel('amp(mV)');
@@ -86,10 +104,10 @@ for i=1:numData
 %     plot이름은 txt파일 이름 그대로 가져옴
     savefig(fileName)
 %     pause시간=20초 동안 plot자를 부분 편집해서 brushedData로 넘겨줌, brushedData 저장시 뒤에 숫자
-%     지우고 덮어쓰기로 brushedData로 저장할 것. 
-    pause on
+%     지우고 덮어쓰기로 brushedData로 저장할 것. figure창에서 처음 조작시 zoom-in mode로 시작. 
+    pause on   
     linkdata on 
-    brush on
+    zoom on
 %     waitforbuttonpress 마우스클릭이나 키보드 누르면 재시작
     pause %명령 프롬프트창에 키보드 누르면 재시작
 %     pause(20) 20초후 재시작 
